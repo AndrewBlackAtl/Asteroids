@@ -17,7 +17,7 @@ public class CannonBullet : OutOfScreenTeleporter, IAmmo
     private int hitMask;
     private float currentLifeTime;
 
-    private protected override Vector2 CurrentPosition { get => currentPos; set => SetPosition(value); }
+    protected override Vector2 CurrentPosition { get => currentPos; set => SetPosition(value); }
 
 
     public CannonBullet(ObjectPool<CannonBullet> pool, GameObjectGraphics graphics, float speed, float lifeTime)

@@ -14,7 +14,7 @@ public class Asteroid : OutOfScreenTeleporter
     private Vector2 direction;
     private float speed;
 
-    private protected override Vector2 CurrentPosition { get => currentPos; set => SetPosition(value); }
+    protected override Vector2 CurrentPosition { get => currentPos; set => SetPosition(value); }
 
     public event Action<Asteroid, Vector2, int> OnDestroy;
 

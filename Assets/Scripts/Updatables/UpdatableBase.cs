@@ -9,7 +9,7 @@
         UpdatableController.Add(this);
     }
 
-    private protected void SetUpdateActive(bool value)
+    protected void SetUpdateActive(bool value)
     {
         if (!isActive && value)
         {

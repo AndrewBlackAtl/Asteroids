@@ -1,0 +1,16 @@
+{
+    "name": "ScreenUtils",
+    "rootNamespace": "",
+    "references": [
+        "GUID:bf499b85a22df4241b965cfb8609b575"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

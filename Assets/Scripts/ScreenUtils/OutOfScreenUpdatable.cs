@@ -5,7 +5,7 @@ using UnityEngine;
 public abstract class OutOfScreenUpdatable : UpdatableBase
 {
     private protected static Vector2 sceneDimension;
-    private protected abstract Vector2 CurrentPosition { get; set; }
+    protected abstract Vector2 CurrentPosition { get; set; }
 
     private protected event Action<OutOfScreenDirection> OnOutOfScreen;
 

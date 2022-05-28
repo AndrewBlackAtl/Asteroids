@@ -25,7 +25,7 @@ public class PlayerSpaceship : OutOfScreenTeleporter
     public event Action<float> SpeedChanged;
     public event Action Destroyed;
 
-    private protected override Vector2 CurrentPosition { get => transform.position; set => transform.position = value; }
+    protected override Vector2 CurrentPosition { get => transform.position; set => transform.position = value; }
 
     public PlayerSpaceship(Transform transform, IGraphics moveGraphics, IPlayerInput input, ICollisionEventSender collisionEventSender, List<Weapon> weapons, IHitSender hitSender,
         float acceleration, float deceleration, float rotateSpeed)

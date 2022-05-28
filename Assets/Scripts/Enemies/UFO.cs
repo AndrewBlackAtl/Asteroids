@@ -17,7 +17,7 @@ public class UFO : OutOfScreenTeleporter
 
     public event Action<UFO> OnDestroy;
 
-    private protected override Vector2 CurrentPosition { get => currentPos; set => SetPosition(value); }
+    protected override Vector2 CurrentPosition { get => currentPos; set => SetPosition(value); }
 
 
     public UFO(ObjectPool<UFO> pool, GameObjectGraphics graphics, Transform target, Weapon weapon, IHitSender hitSender, float startShootDelay)
