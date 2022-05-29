@@ -113,13 +113,13 @@ public class PlayerSpaceship : OutOfScreenTeleporter
     {
         if (isMoving)
         {
-            velocity += acceleration * (Vector2)transform.right;
+            velocity += acceleration * deltaTime * (Vector2)transform.right;
         }
         else
         {
             if (velocity.magnitude > velocityThreshold)
             {
-                velocity -= deceleration * velocity.normalized;
+                velocity -= deceleration * deltaTime * velocity.normalized;
             }
             else
             {

@@ -30,6 +30,7 @@ public class CannonBullet : OutOfScreenTeleporter, IAmmo
 
     private void SetPosition(Vector2 value)
     {
+        lastPos = value;
         currentPos = value;
         graphics.SetPosition(value);
     }

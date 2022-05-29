@@ -2777,6 +2777,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   input: {fileID: 1231989798}
+  gameUI: {fileID: 915428845}
+  gameOverPopup: {fileID: 632226155}
   spaceshipTransform: {fileID: 475072990}
   cannonTransform: {fileID: 1178811631}
   laserTransform: {fileID: 1200390560}
@@ -2784,12 +2786,19 @@ MonoBehaviour:
   activeMoveSprite: {fileID: 1772919802, guid: 363be4274061b074f938cd4447c2b3ab, type: 3}
   inactiveMoveSprite: {fileID: 1119589796, guid: 363be4274061b074f938cd4447c2b3ab, type: 3}
   collisionSenderTransform: {fileID: 475072990}
+  acceleration: 3
+  deceleration: 0.5
+  rotateSpeed: 210
   bulletGraphicsPrefab: {fileID: 9003878591881612972, guid: 6c91ee48946760441a3fd6a50320f346, type: 3}
+  bulletSpeed: 10
+  bulletLifeTime: 1.5
   laserGraphicsPrefab: {fileID: 3000742511947443751, guid: 25536b79a71cead438baeffac01be648, type: 3}
+  laserLifeTime: 0.1
+  laserCharges: 3
+  laserRechargeDuration: 5
   asteroidPrefab: {fileID: 6272145591654543123, guid: 9b025b234c2ae074ea66beef35f0ed2e, type: 3}
-  UFOPrefab: {fileID: 4638842623640342410, guid: 3539b4980e5b02a4d8f224d56cdcee95, type: 3}
-  gameUI: {fileID: 915428845}
-  gameOverPopup: {fileID: 632226155}
+  maxAsteroidGen: 2
+  nextGenAsteroidsNum: 2
   genSizes:
   - 0.9
   - 0.5
@@ -2802,22 +2811,12 @@ MonoBehaviour:
   - 1.5
   - 2
   - 2.5
-  genScore: 64000000c80000002c010000
-  UFOScore: 500
-  bulletSpeed: 10
-  bulletLifeTime: 1.5
-  laserLifeTime: 0.1
-  laserCharges: 3
-  laserRechargeDuration: 5
-  acceleration: 0.015
-  deceleration: 0.0025
-  rotateSpeed: 180
   startAsteroidsNum: 4
   asteroidsPerWaveIncrease: 2
-  maxAsteroidGen: 2
-  nextGenAsteroidsNum: 2
   asteroidSpawnHorizontalOffset: 0.15
   asteroidSpawnVerticalOffset: 0.15
+  genScore: 64000000c80000002c010000
+  UFOPrefab: {fileID: 4638842623640342410, guid: 3539b4980e5b02a4d8f224d56cdcee95, type: 3}
   UFOCannonRechargeDuration: 1
   UFOMinSpeed: 1
   UFOMaxSpeed: 2
@@ -2826,6 +2825,7 @@ MonoBehaviour:
   UFOSpawnHorizontalOffset: 0.05
   UFOSpawnVerticalOffset: 0.05
   UFOStartShootDelay: 1
+  UFOScore: 500
 --- !u!4 &1843286701
 Transform:
   m_ObjectHideFlags: 0
