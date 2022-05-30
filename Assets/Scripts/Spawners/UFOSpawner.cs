@@ -36,7 +36,7 @@ public class UFOSpawner : Spawner, IUpdatable
 
         UFOPool = new ObjectPool<UFO>(UFOCreateFunc, (obj) => obj.PoolOnGet(), (obj) => obj.PoolOnRelease(), null, false, 1);
 
-        UpdatableController.Add(this);
+        UpdatableController.I.Add(this);
     }
 
     private UFO UFOCreateFunc()
@@ -46,7 +46,7 @@ public class UFOSpawner : Spawner, IUpdatable
         var hitSender = UFOGO.GetComponent<IHitSender>();
         var weaponTransform = UFOGO.transform.Find("Weapon");
         weapon.Transform = weaponTransform;
-        return new UFO(UFOPool, graphics, target, weapon, hitSender, startShootDelay);
+        return new UFO(UFOPool, graphics, target, weapon, hitSender, startShootDelay, sceneDimension);
     }
 
     public void Start()

@@ -67,26 +67,25 @@ public class GameController : MonoBehaviour
 
     private void Setup()
     {
-        AmmoFactory ammoFactory = new AmmoFactory(bulletGraphicsPrefab, bulletSpeed, bulletLifeTime, laserGraphicsPrefab, laserLifeTime);
-
         var sceneDimension = (Vector2)Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0));
-        OutOfScreenUpdatable.SetSceneDimension(sceneDimension);
+        AmmoFactory ammoFactory = new AmmoFactory(bulletGraphicsPrefab, bulletSpeed, bulletLifeTime, laserGraphicsPrefab, laserLifeTime, sceneDimension);
+        ProjectPhysics projPhycics = new ProjectPhysics();
 
-        PlayerSetup(ammoFactory);
-        SpawnersSetup(ammoFactory, sceneDimension, out AsteroidSpawner asteroidSpawner, out UFOSpawner UFOSpawner);
+        PlayerSetup(ammoFactory, projPhycics.PlayerHitMask, sceneDimension);
+        SpawnersSetup(ammoFactory, sceneDimension, projPhycics.EnemyHitMask, out AsteroidSpawner asteroidSpawner, out UFOSpawner UFOSpawner);
         ScoreSetup(asteroidSpawner, UFOSpawner);
 
         asteroidSpawner.Start();
         UFOSpawner.Start();
     }
 
-    private void PlayerSetup(AmmoFactory ammoFactory) 
+    private void PlayerSetup(AmmoFactory ammoFactory, int playerHitMask, Vector2 sceneDimension) 
     {
-        var playerCannon = new SimpleWeapon(ammoFactory, AmmoType.CanonBullet, ProjectPhysics.GetPlayerHitMask)
+        var playerCannon = new SimpleWeapon(ammoFactory, AmmoType.CanonBullet, playerHitMask)
         {
             Transform = cannonTransform
         };
-        var playerLaser = new RechargeableWeapon(ammoFactory, AmmoType.LaserRay, ProjectPhysics.GetPlayerHitMask, laserCharges, laserRechargeDuration)
+        var playerLaser = new RechargeableWeapon(ammoFactory, AmmoType.LaserRay, playerHitMask, laserCharges, laserRechargeDuration)
         {
             Transform = laserTransform
         };
@@ -105,7 +104,8 @@ public class GameController : MonoBehaviour
             hitSender,
             acceleration,
             deceleration,
-            rotateSpeed);
+            rotateSpeed,
+            sceneDimension);
 
         spaceship.SetActiveWeapon(0);
 
@@ -126,19 +126,19 @@ public class GameController : MonoBehaviour
         UFOSpawner.UFODestroyed += scoreCounter.OnUFODestroyed;
     }
 
-    private void SpawnersSetup(AmmoFactory ammoFactory, Vector2 sceneDimension, out AsteroidSpawner asteroidSpawner, out UFOSpawner UFOSpawner) 
+    private void SpawnersSetup(AmmoFactory ammoFactory, Vector2 sceneDimension, int enemyHitMask, out AsteroidSpawner asteroidSpawner, out UFOSpawner UFOSpawner) 
     {
         asteroidSpawner = new AsteroidSpawner(startAsteroidsNum, asteroidsPerWaveIncrease, asteroidPrefab,
             genSizes, maxGenSpeeds, maxGenSpeeds, maxAsteroidGen, nextGenAsteroidsNum, sceneDimension, asteroidSpawnHorizontalOffset, asteroidSpawnVerticalOffset);
 
-        var UFOCannon = new RechargeableWeapon(ammoFactory, AmmoType.CanonBullet, ProjectPhysics.GetEnemyHitMask, 1, UFOCannonRechargeDuration);
+        var UFOCannon = new RechargeableWeapon(ammoFactory, AmmoType.CanonBullet, enemyHitMask, 1, UFOCannonRechargeDuration);
         UFOSpawner = new UFOSpawner(spaceshipTransform, UFOPrefab, UFOCannon, UFOMinSpeed, UFOMaxSpeed, UFOStartShootDelay,
             sceneDimension, UFOSpawnHorizontalOffset, UFOSpawnVerticalOffset, UFOMinSpawnTime, UFOMaxSpawnTime);
     }
 
     private void GameOver()
     {
-        UpdatableController.RemoveAll();
+        UpdatableController.I.RemoveAll();
         gameOverPopup.Show(scoreCounter.CurrentScore);
         gameOverPopup.TryAgainClick += RestartGame;
     }

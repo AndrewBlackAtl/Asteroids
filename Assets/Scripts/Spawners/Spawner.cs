@@ -3,10 +3,11 @@ using Random = UnityEngine.Random;
 
 public abstract class Spawner 
 {
-    private readonly Vector2 sceneDimension;
     private readonly float horizontalOffset;
     private readonly float verticalOffset;
 
+    protected readonly Vector2 sceneDimension;
+    
 
     public Spawner(Vector2 sceneDimension, float horizontalOffset, float verticalOffset) 
     {

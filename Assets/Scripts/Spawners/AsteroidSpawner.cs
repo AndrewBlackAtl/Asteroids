@@ -46,7 +46,7 @@ public class AsteroidSpawner : Spawner
         var asteroidGO = Object.Instantiate(asteroidPrefab);
         var graphics = new GameObjectGraphics(asteroidGO);
         var hitSender = asteroidGO.GetComponent<IHitSender>();
-        return new Asteroid(asteroidsPool, graphics, genSizes, hitSender);
+        return new Asteroid(asteroidsPool, graphics, genSizes, hitSender, sceneDimension);
     }
 
     public void Start()

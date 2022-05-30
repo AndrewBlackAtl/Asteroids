@@ -11,10 +11,10 @@ public class AmmoFactory
     private const int defaultLazerCapacity = 3;
 
 
-    public AmmoFactory(GameObject bulletGraphicsPrefab, float bulletSpeed, float bulletLifeTime, GameObject laserGraphicsPrefab, float laserLifeTime)
+    public AmmoFactory(GameObject bulletGraphicsPrefab, float bulletSpeed, float bulletLifeTime, GameObject laserGraphicsPrefab, float laserLifeTime, Vector2 sceneDimension)
     {
         bulletPool = new ObjectPool<CannonBullet>(() =>
-        new CannonBullet(bulletPool, new GameObjectGraphics(Object.Instantiate(bulletGraphicsPrefab)), bulletSpeed, bulletLifeTime), 
+        new CannonBullet(bulletPool, new GameObjectGraphics(Object.Instantiate(bulletGraphicsPrefab)), bulletSpeed, bulletLifeTime, sceneDimension), 
         (obj) => obj.PoolOnGet(), (obj) => obj.PoolOnRelease(), null, false, defaultBulletCapacity);
 
         laserPool = new ObjectPool<LaserRay>(() =>

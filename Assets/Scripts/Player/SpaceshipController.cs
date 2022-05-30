@@ -28,7 +28,7 @@ public class PlayerSpaceship : OutOfScreenTeleporter
     protected override Vector2 CurrentPosition { get => transform.position; set => transform.position = value; }
 
     public PlayerSpaceship(Transform transform, IGraphics moveGraphics, IPlayerInput input, ICollisionEventSender collisionEventSender, List<Weapon> weapons, IHitSender hitSender,
-        float acceleration, float deceleration, float rotateSpeed)
+        float acceleration, float deceleration, float rotateSpeed, Vector2 sceneDimension) : base(sceneDimension)
     {
         this.input = input;
         this.input.OnSwitchWeapon += SetActiveWeapon;

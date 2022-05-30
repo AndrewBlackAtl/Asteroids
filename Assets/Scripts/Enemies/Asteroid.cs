@@ -9,22 +9,24 @@ public class Asteroid : OutOfScreenTeleporter
     private readonly GameObjectGraphics graphics;
     private readonly float[] generationSizes;
 
-    private Vector2 currentPos;
+    private readonly LinearMovement movement;
+
     private int generation;
     private Vector2 direction;
     private float speed;
 
-    protected override Vector2 CurrentPosition { get => currentPos; set => SetPosition(value); }
+    protected override Vector2 CurrentPosition { get => movement.CurrentPos; set => SetPosition(value); }
 
     public event Action<Asteroid, Vector2, int> OnDestroy;
 
 
-    public Asteroid(ObjectPool<Asteroid> pool, GameObjectGraphics graphics, float[] generationSizes, IHitSender hitSender)
+    public Asteroid(ObjectPool<Asteroid> pool, GameObjectGraphics graphics, float[] generationSizes, IHitSender hitSender, Vector2 sceneDimension) : base(sceneDimension)
     {
         this.pool = pool;
         this.graphics = graphics;
         this.generationSizes = generationSizes;
         hitSender.OnHit += OnHit;
+        movement = new LinearMovement();
     }
 
     public void Launch(Vector2 startPos, Vector2 dir, float speed, int generation)
@@ -39,14 +41,14 @@ public class Asteroid : OutOfScreenTeleporter
 
     private void SetPosition(Vector2 value)
     {
-        currentPos = value;
+        movement.CurrentPos = value;
         graphics.SetPosition(value);
     }
 
     public override void Update(float deltaTime)
     {
-        currentPos += speed * deltaTime * direction;
-        graphics.SetPosition(currentPos);
+        movement.Move(speed * deltaTime, direction);
+        graphics.SetPosition(movement.CurrentPos);
 
         base.Update(deltaTime);
     }
@@ -65,6 +67,6 @@ public class Asteroid : OutOfScreenTeleporter
     private void OnHit()
     {
         pool.Release(this);
-        OnDestroy?.Invoke(this, currentPos, generation);
+        OnDestroy?.Invoke(this, movement.CurrentPos, generation);
     }
 }

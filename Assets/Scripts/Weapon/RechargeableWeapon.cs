@@ -22,7 +22,7 @@ public class RechargeableWeapon : Weapon, IUpdatable
         this.rechargeDuration = rechargeDuration;
         currentCharges = chargesNum;
         currentRechargeTimer = rechargeDuration;
-        UpdatableController.Add(this);
+        UpdatableController.I.Add(this);
     }
 
     public override void Shoot()

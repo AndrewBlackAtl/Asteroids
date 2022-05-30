@@ -6,7 +6,7 @@
     public UpdatableBase()
     {
         isActive = true;
-        UpdatableController.Add(this);
+        UpdatableController.I.Add(this);
     }
 
     protected void SetUpdateActive(bool value)
@@ -14,12 +14,12 @@
         if (!isActive && value)
         {
             isActive = true;
-            UpdatableController.Add(this);
+            UpdatableController.I.Add(this);
         }
         else if (isActive && !value)
         {
             isActive = false;
-            UpdatableController.Remove(this);
+            UpdatableController.I.Remove(this);
         }
     }
 

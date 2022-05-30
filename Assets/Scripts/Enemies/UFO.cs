@@ -10,17 +10,18 @@ public class UFO : OutOfScreenTeleporter
     private readonly Transform target;
     private readonly float startShootDelay;
 
-    private Vector2 currentPos;
-    private Vector2 velocity;
+    private readonly LinearMovement movement;
+
     private float speed;
     private float currentShootDelay;
 
     public event Action<UFO> OnDestroy;
 
-    protected override Vector2 CurrentPosition { get => currentPos; set => SetPosition(value); }
+    protected override Vector2 CurrentPosition { get => movement.CurrentPos; set => SetPosition(value); }
 
 
-    public UFO(ObjectPool<UFO> pool, GameObjectGraphics graphics, Transform target, Weapon weapon, IHitSender hitSender, float startShootDelay)
+    public UFO(ObjectPool<UFO> pool, GameObjectGraphics graphics, Transform target, Weapon weapon, IHitSender hitSender, float startShootDelay, Vector2 sceneDimension) 
+        : base(sceneDimension)
     {
         this.pool = pool;
         this.graphics = graphics;
@@ -28,6 +29,7 @@ public class UFO : OutOfScreenTeleporter
         this.target = target;
         this.startShootDelay = startShootDelay;
         hitSender.OnHit += OnHit;
+        movement = new LinearMovement();
     }
 
     private void OnHit()
@@ -38,7 +40,7 @@ public class UFO : OutOfScreenTeleporter
 
     private void SetPosition(Vector2 value)
     {
-        currentPos = value;
+        movement.CurrentPos = value;
         graphics.SetPosition(value);
     }
 
@@ -52,12 +54,10 @@ public class UFO : OutOfScreenTeleporter
 
     public override void Update(float deltaTime)
     {
-        velocity = speed * deltaTime * ((Vector2)target.position - currentPos).normalized;
+        movement.Move(speed * deltaTime, ((Vector2)target.position - movement.CurrentPos).normalized);
+        graphics.SetPosition(movement.CurrentPos);
 
-        currentPos += velocity;
-        SetPosition(currentPos);
-
-        weapon.Transform.right = ((Vector2)target.position - currentPos).normalized;
+        weapon.Transform.right = ((Vector2)target.position - movement.CurrentPos).normalized;
 
         if (currentShootDelay < startShootDelay)
         {
