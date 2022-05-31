@@ -12,6 +12,7 @@ public class RechargeableWeapon : Weapon, IUpdatable
 
     public event Action<int> ChargesChanged;
     public event Action<float> RechargeTimerChanged;
+    public event Action<IUpdatable, bool> SetUpdateActive;
 
     public override bool CanShootNow => currentCharges > 0;
 
@@ -22,7 +23,6 @@ public class RechargeableWeapon : Weapon, IUpdatable
         this.rechargeDuration = rechargeDuration;
         currentCharges = chargesNum;
         currentRechargeTimer = rechargeDuration;
-        UpdatableController.I.Add(this);
     }
 
     public override void Shoot()

@@ -2,7 +2,7 @@
 using UnityEngine.Pool;
 
 
-public class LaserRay : UpdatableBase, IAmmo
+public class LaserRay : IUpdatable, IAmmo
 {
     private readonly GameObjectGraphics graphics;
     private readonly ObjectPool<LaserRay> pool;
@@ -18,6 +18,8 @@ public class LaserRay : UpdatableBase, IAmmo
         this.lifeTime = lifeTime;
     }
 
+    public event System.Action<IUpdatable, bool> SetUpdateActive;
+
     public void Launch(Vector2 startPos, Vector2 direction, int hitMask)
     {
         graphics.SetPosition(startPos);
@@ -31,7 +33,7 @@ public class LaserRay : UpdatableBase, IAmmo
             item.transform.GetComponent<IHitable>().Hit();
         }
 
-        SetUpdateActive(true);
+        SetUpdateActive?.Invoke(this, true);
     }
 
     public void PoolOnGet()
@@ -42,11 +44,11 @@ public class LaserRay : UpdatableBase, IAmmo
 
     public void PoolOnRelease()
     {
-        SetUpdateActive(false);
+        SetUpdateActive?.Invoke(this, false);
         graphics.SetActive(false);
     }
 
-    public override void Update(float deltaTime)
+    public void Update(float deltaTime)
     {
         currentLifeTime -= deltaTime;
         if (currentLifeTime <= 0f)

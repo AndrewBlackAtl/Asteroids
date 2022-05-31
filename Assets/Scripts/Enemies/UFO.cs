@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.Pool;
 
-public class UFO : OutOfScreenTeleporter
+public class UFO : IOutOfScreenObject
 {
     private readonly Weapon weapon;
     private readonly GameObjectGraphics graphics;
@@ -16,12 +16,12 @@ public class UFO : OutOfScreenTeleporter
     private float currentShootDelay;
 
     public event Action<UFO> OnDestroy;
+    public event Action<IUpdatable, bool> SetUpdateActive;
 
-    protected override Vector2 CurrentPosition { get => movement.CurrentPos; set => SetPosition(value); }
+    public Vector2 CurrentPosition { get => movement.CurrentPos; set => SetPosition(value); }
 
 
-    public UFO(ObjectPool<UFO> pool, GameObjectGraphics graphics, Transform target, Weapon weapon, IHitSender hitSender, float startShootDelay, Vector2 sceneDimension) 
-        : base(sceneDimension)
+    public UFO(ObjectPool<UFO> pool, GameObjectGraphics graphics, Transform target, Weapon weapon, IHitSender hitSender, float startShootDelay)
     {
         this.pool = pool;
         this.graphics = graphics;
@@ -49,10 +49,11 @@ public class UFO : OutOfScreenTeleporter
         this.speed = speed;
         currentShootDelay = 0f;
         SetPosition(startPos);
-        SetUpdateActive(true);
+
+        SetUpdateActive?.Invoke(this, true);
     }
 
-    public override void Update(float deltaTime)
+    public void Update(float deltaTime)
     {
         movement.Move(speed * deltaTime, ((Vector2)target.position - movement.CurrentPos).normalized);
         graphics.SetPosition(movement.CurrentPos);
@@ -67,8 +68,6 @@ public class UFO : OutOfScreenTeleporter
         {
             weapon.Shoot();
         }
-
-        base.Update(deltaTime);
     }
 
     public void PoolOnGet()
@@ -78,7 +77,7 @@ public class UFO : OutOfScreenTeleporter
 
     public void PoolOnRelease()
     {
-        SetUpdateActive(false);
+        SetUpdateActive?.Invoke(this, false);
         graphics.SetActive(false);
-    } 
+    }
 }

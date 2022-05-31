@@ -3,34 +3,26 @@ using UnityEngine;
 
 public class UpdatableController : MonoBehaviour
 {
-    private static UpdatableController i;
-    public static UpdatableController I => i;
-
-
     private readonly LinkedList<IUpdatable> updatables = new LinkedList<IUpdatable>();
 
 
-
-    private void Awake()
-    {
-        if (i != null && i != this)
-        {
-            Destroy(this);
-        }
-        else
-        {
-            i = this;
-        }
-    }
-
     public void Add(IUpdatable updatable)
     {
+        updatable.SetUpdateActive += OnSetActive;
+
         updatables.AddLast(updatable);
     }
 
-    public void Remove(IUpdatable updatable)
+    private void OnSetActive(IUpdatable sender, bool value)
     {
-        updatables.Remove(updatable);
+        if (value && !updatables.Contains(sender))
+        {
+            updatables.AddLast(sender);
+        }
+        else if (!value && updatables.Contains(sender))
+        {
+            updatables.Remove(sender);
+        }
     }
 
     public void RemoveAll()
@@ -51,10 +43,5 @@ public class UpdatableController : MonoBehaviour
     private void OnDestroy()
     {
         updatables.Clear();
-
-        if (this != null)
-        {
-            i = null;
-        }
     }
 }

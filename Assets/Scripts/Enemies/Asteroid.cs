@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Pool;
 
 
-public class Asteroid : OutOfScreenTeleporter
+public class Asteroid : IOutOfScreenObject
 {
     private readonly ObjectPool<Asteroid> pool;
     private readonly GameObjectGraphics graphics;
@@ -15,12 +15,12 @@ public class Asteroid : OutOfScreenTeleporter
     private Vector2 direction;
     private float speed;
 
-    protected override Vector2 CurrentPosition { get => movement.CurrentPos; set => SetPosition(value); }
+    public Vector2 CurrentPosition { get => movement.CurrentPos; set => SetPosition(value); }
 
     public event Action<Asteroid, Vector2, int> OnDestroy;
+    public event Action<IUpdatable, bool> SetUpdateActive;
 
-
-    public Asteroid(ObjectPool<Asteroid> pool, GameObjectGraphics graphics, float[] generationSizes, IHitSender hitSender, Vector2 sceneDimension) : base(sceneDimension)
+    public Asteroid(ObjectPool<Asteroid> pool, GameObjectGraphics graphics, float[] generationSizes, IHitSender hitSender)
     {
         this.pool = pool;
         this.graphics = graphics;
@@ -36,7 +36,8 @@ public class Asteroid : OutOfScreenTeleporter
         this.generation = generation;
         SetPosition(startPos);
         graphics.SetScale(generationSizes[generation]);
-        SetUpdateActive(true);
+
+        SetUpdateActive?.Invoke(this, true);
     }
 
     private void SetPosition(Vector2 value)
@@ -45,12 +46,10 @@ public class Asteroid : OutOfScreenTeleporter
         graphics.SetPosition(value);
     }
 
-    public override void Update(float deltaTime)
+    public void Update(float deltaTime)
     {
         movement.Move(speed * deltaTime, direction);
         graphics.SetPosition(movement.CurrentPos);
-
-        base.Update(deltaTime);
     }
 
     public void PoolOnGet()
@@ -60,7 +59,7 @@ public class Asteroid : OutOfScreenTeleporter
 
     public void PoolOnRelease()
     {
-        SetUpdateActive(false);
+        SetUpdateActive?.Invoke(this, false);
         graphics.SetActive(false);
     }
 

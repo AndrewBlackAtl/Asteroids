@@ -7,11 +7,10 @@ using Random = UnityEngine.Random;
 
 public class AsteroidSpawner : Spawner
 {
+    private readonly UpdatableController updatableController;
     private readonly int startAsteroidsNum;
     private readonly int asteroidsPerWaveIncrease;
-    private readonly GameObject asteroidPrefab;
     private readonly ObjectPool<Asteroid> asteroidsPool;
-    private readonly float[] genSizes;
     private readonly float[] minGenSpeeds;
     private readonly float[] maxGenSpeeds;
     private readonly int maxGen;
@@ -25,28 +24,30 @@ public class AsteroidSpawner : Spawner
     public event Action<int> AsteroidDestroyed;
 
 
-    public AsteroidSpawner(int startAsteroidsNum, int asteroidsPerWaveIncrease, GameObject asteroidPrefab, 
+    public AsteroidSpawner(UpdatableController updatableController, int startAsteroidsNum, int asteroidsPerWaveIncrease, GameObject asteroidPrefab, 
         float[] genSizes, float[] minGenSpeeds, float[] maxGenSpeeds, int maxGen, int nextGenNum, Vector2 sceneDimension, float horizontalOffset, float verticalOffset) 
         : base(sceneDimension, horizontalOffset, verticalOffset)
     {
-        this.asteroidPrefab = asteroidPrefab;
+        this.updatableController = updatableController;
         this.startAsteroidsNum = startAsteroidsNum;
         this.asteroidsPerWaveIncrease = asteroidsPerWaveIncrease;
-        this.genSizes = genSizes;
         this.minGenSpeeds = minGenSpeeds;
         this.maxGenSpeeds = maxGenSpeeds;
         this.maxGen = maxGen;
         this.nextGenNum = nextGenNum;
 
-        asteroidsPool = new ObjectPool<Asteroid>(AsteroidCreateFunc, (obj) => obj.PoolOnGet(), (obj) => obj.PoolOnRelease(), null, false, defaultAsteroidCapacity);
+        asteroidsPool = new ObjectPool<Asteroid>(() => CreateAsteroid(asteroidPrefab, genSizes), 
+            (obj) => obj.PoolOnGet(), (obj) => obj.PoolOnRelease(), null, false, defaultAsteroidCapacity);
     }
 
-    private Asteroid AsteroidCreateFunc()
+    private Asteroid CreateAsteroid(GameObject prefab, float[] genSizes)
     {
-        var asteroidGO = Object.Instantiate(asteroidPrefab);
+        var asteroidGO = Object.Instantiate(prefab);
         var graphics = new GameObjectGraphics(asteroidGO);
         var hitSender = asteroidGO.GetComponent<IHitSender>();
-        return new Asteroid(asteroidsPool, graphics, genSizes, hitSender, sceneDimension);
+        var asteroid = new Asteroid(asteroidsPool, graphics, genSizes, hitSender);
+        updatableController.Add(new OutOfScreenObject(asteroid, sceneDimension));
+        return asteroid;
     }
 
     public void Start()

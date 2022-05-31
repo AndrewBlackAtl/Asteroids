@@ -1,4 +1,7 @@
-﻿public interface IUpdatable
+﻿using System;
+
+public interface IUpdatable
 {
+    public event Action<IUpdatable, bool> SetUpdateActive;
     public void Update(float deltaTime);
 }

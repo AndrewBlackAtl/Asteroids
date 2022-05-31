@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerSpaceship : OutOfScreenTeleporter
+public class PlayerSpaceship : IOutOfScreenObject
 {
     private readonly Transform transform;
     private readonly List<Weapon> weapons;
@@ -24,11 +24,12 @@ public class PlayerSpaceship : OutOfScreenTeleporter
     public event Action<Vector2> PositionChanged;
     public event Action<float> SpeedChanged;
     public event Action Destroyed;
+    public event Action<IUpdatable, bool> SetUpdateActive;
 
-    protected override Vector2 CurrentPosition { get => transform.position; set => transform.position = value; }
+    public Vector2 CurrentPosition { get => transform.position; set => transform.position = value; }
 
     public PlayerSpaceship(Transform transform, IGraphics moveGraphics, IPlayerInput input, ICollisionEventSender collisionEventSender, List<Weapon> weapons, IHitSender hitSender,
-        float acceleration, float deceleration, float rotateSpeed, Vector2 sceneDimension) : base(sceneDimension)
+        float acceleration, float deceleration, float rotateSpeed)
     {
         this.input = input;
         this.input.OnSwitchWeapon += SetActiveWeapon;
@@ -109,7 +110,7 @@ public class PlayerSpaceship : OutOfScreenTeleporter
         }
     }
 
-    public override void Update(float deltaTime)
+    public void Update(float deltaTime)
     {
         if (isMoving)
         {
@@ -137,7 +138,5 @@ public class PlayerSpaceship : OutOfScreenTeleporter
             transform.Rotate(new Vector3(0f, 0f, currentRotateDirection * deltaTime * rotateSpeed));
             RotationChanged?.Invoke(transform.eulerAngles.z);
         }
-
-        base.Update(deltaTime);
     }
 }

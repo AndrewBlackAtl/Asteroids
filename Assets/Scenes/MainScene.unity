@@ -2777,6 +2777,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   input: {fileID: 1231989798}
+  updatableController: {fileID: 1758536761}
   gameUI: {fileID: 915428845}
   gameOverPopup: {fileID: 632226155}
   spaceshipTransform: {fileID: 475072990}

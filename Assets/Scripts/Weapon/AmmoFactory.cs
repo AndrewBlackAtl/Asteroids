@@ -6,20 +6,36 @@ public class AmmoFactory
 {
     private readonly ObjectPool<CannonBullet> bulletPool;
     private readonly ObjectPool<LaserRay> laserPool;
+    private readonly UpdatableController updatableController;
 
     private const int defaultBulletCapacity = 30;
     private const int defaultLazerCapacity = 3;
 
 
-    public AmmoFactory(GameObject bulletGraphicsPrefab, float bulletSpeed, float bulletLifeTime, GameObject laserGraphicsPrefab, float laserLifeTime, Vector2 sceneDimension)
+    public AmmoFactory(GameObject bulletGraphicsPrefab, float bulletSpeed, float bulletLifeTime, 
+        GameObject laserGraphicsPrefab, float laserLifeTime, UpdatableController updatableController, Vector2 sceneDimension)
     {
-        bulletPool = new ObjectPool<CannonBullet>(() =>
-        new CannonBullet(bulletPool, new GameObjectGraphics(Object.Instantiate(bulletGraphicsPrefab)), bulletSpeed, bulletLifeTime, sceneDimension), 
+        this.updatableController = updatableController;
+
+        bulletPool = new ObjectPool<CannonBullet>(() => CreateBullet(bulletGraphicsPrefab, bulletSpeed, bulletLifeTime, sceneDimension), 
         (obj) => obj.PoolOnGet(), (obj) => obj.PoolOnRelease(), null, false, defaultBulletCapacity);
 
-        laserPool = new ObjectPool<LaserRay>(() =>
-        new LaserRay(laserPool, new GameObjectGraphics(Object.Instantiate(laserGraphicsPrefab)), laserLifeTime), 
+        laserPool = new ObjectPool<LaserRay>(() => CreateLaserRay(laserGraphicsPrefab, laserLifeTime),
         (obj) => obj.PoolOnGet(), (obj) => obj.PoolOnRelease(), null, false, defaultLazerCapacity);
+    }
+
+    private CannonBullet CreateBullet(GameObject prefab, float speed, float lifeTime, Vector2 sceneDimension) 
+    {
+        var bullet = new CannonBullet(bulletPool, new GameObjectGraphics(Object.Instantiate(prefab)), speed, lifeTime);
+        updatableController.Add(new OutOfScreenObject(bullet, sceneDimension));
+        return bullet;
+    }
+
+    private LaserRay CreateLaserRay(GameObject prefab, float lifeTime) 
+    {
+        var laser = new LaserRay(laserPool, new GameObjectGraphics(Object.Instantiate(prefab)), lifeTime);
+        updatableController.Add(laser);
+        return laser;
     }
 
 

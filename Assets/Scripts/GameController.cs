@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 public class GameController : MonoBehaviour
 {
     [SerializeField] private PlayerInput input;
+    [SerializeField] private UpdatableController updatableController;
 
     [SerializeField] private GameUI gameUI;
     [SerializeField] private GameOverPopup gameOverPopup;
@@ -56,9 +57,8 @@ public class GameController : MonoBehaviour
     [SerializeField] private float UFOStartShootDelay;
     [SerializeField] private int UFOScore;
 
-
     private ScoreCounter scoreCounter;
-
+    
 
     private void Start()
     {
@@ -68,7 +68,7 @@ public class GameController : MonoBehaviour
     private void Setup()
     {
         var sceneDimension = (Vector2)Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0));
-        AmmoFactory ammoFactory = new AmmoFactory(bulletGraphicsPrefab, bulletSpeed, bulletLifeTime, laserGraphicsPrefab, laserLifeTime, sceneDimension);
+        AmmoFactory ammoFactory = new AmmoFactory(bulletGraphicsPrefab, bulletSpeed, bulletLifeTime, laserGraphicsPrefab, laserLifeTime, updatableController, sceneDimension);
         ProjectPhysics projPhycics = new ProjectPhysics();
 
         PlayerSetup(ammoFactory, projPhycics.PlayerHitMask, sceneDimension);
@@ -89,6 +89,7 @@ public class GameController : MonoBehaviour
         {
             Transform = laserTransform
         };
+        updatableController.Add(playerLaser);
         
         List<Weapon> weapons = new List<Weapon>() { playerCannon, playerLaser };
         ICollisionEventSender collisionSender = collisionSenderTransform.GetComponent<ICollisionEventSender>();
@@ -104,10 +105,11 @@ public class GameController : MonoBehaviour
             hitSender,
             acceleration,
             deceleration,
-            rotateSpeed,
-            sceneDimension);
+            rotateSpeed);
 
         spaceship.SetActiveWeapon(0);
+
+        updatableController.Add(new OutOfScreenObject(spaceship, sceneDimension));
 
         playerLaser.ChargesChanged += gameUI.OnLaserChargesChanged;
         playerLaser.RechargeTimerChanged += gameUI.OnLaserCooldownChanged;
@@ -128,17 +130,20 @@ public class GameController : MonoBehaviour
 
     private void SpawnersSetup(AmmoFactory ammoFactory, Vector2 sceneDimension, int enemyHitMask, out AsteroidSpawner asteroidSpawner, out UFOSpawner UFOSpawner) 
     {
-        asteroidSpawner = new AsteroidSpawner(startAsteroidsNum, asteroidsPerWaveIncrease, asteroidPrefab,
+        asteroidSpawner = new AsteroidSpawner(updatableController, startAsteroidsNum, asteroidsPerWaveIncrease, asteroidPrefab,
             genSizes, maxGenSpeeds, maxGenSpeeds, maxAsteroidGen, nextGenAsteroidsNum, sceneDimension, asteroidSpawnHorizontalOffset, asteroidSpawnVerticalOffset);
 
         var UFOCannon = new RechargeableWeapon(ammoFactory, AmmoType.CanonBullet, enemyHitMask, 1, UFOCannonRechargeDuration);
-        UFOSpawner = new UFOSpawner(spaceshipTransform, UFOPrefab, UFOCannon, UFOMinSpeed, UFOMaxSpeed, UFOStartShootDelay,
+        updatableController.Add(UFOCannon);
+
+        UFOSpawner = new UFOSpawner(updatableController, spaceshipTransform, UFOPrefab, UFOCannon, UFOMinSpeed, UFOMaxSpeed, UFOStartShootDelay,
             sceneDimension, UFOSpawnHorizontalOffset, UFOSpawnVerticalOffset, UFOMinSpawnTime, UFOMaxSpawnTime);
+        updatableController.Add(UFOSpawner);
     }
 
     private void GameOver()
     {
-        UpdatableController.I.RemoveAll();
+        updatableController.RemoveAll();
         gameOverPopup.Show(scoreCounter.CurrentScore);
         gameOverPopup.TryAgainClick += RestartGame;
     }

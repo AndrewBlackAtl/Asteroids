@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Pool;
 
 
-public class CannonBullet : OutOfScreenTeleporter, IAmmo
+public class CannonBullet : IOutOfScreenObject, IAmmo
 {
     private readonly GameObjectGraphics graphics;
     private readonly ObjectPool<CannonBullet> pool;
@@ -17,10 +18,12 @@ public class CannonBullet : OutOfScreenTeleporter, IAmmo
     private int hitMask;
     private float currentLifeTime;
 
-    protected override Vector2 CurrentPosition { get => movement.CurrentPos; set => SetPosition(value); }
+    public event Action<IUpdatable, bool> SetUpdateActive;
+
+    public Vector2 CurrentPosition { get => movement.CurrentPos; set => SetPosition(value); }
 
 
-    public CannonBullet(ObjectPool<CannonBullet> pool, GameObjectGraphics graphics, float speed, float lifeTime, Vector2 sceneDimension) : base(sceneDimension)
+    public CannonBullet(ObjectPool<CannonBullet> pool, GameObjectGraphics graphics, float speed, float lifeTime)
     {
         this.pool = pool;
         this.graphics = graphics;
@@ -42,13 +45,13 @@ public class CannonBullet : OutOfScreenTeleporter, IAmmo
         this.direction = direction;
         this.hitMask = hitMask;
 
-        SetUpdateActive(true);
+        SetUpdateActive?.Invoke(this, true);
     }
 
-    public override void Update(float deltaTime)
+    public void Update(float deltaTime)
     {
         movement.Move(speed * deltaTime, direction);
-        
+
         if (Physics2D.LinecastNonAlloc(lastPos, movement.CurrentPos, hitResult, hitMask) > 0)
         {
             hitResult[0].transform.GetComponent<IHitable>().Hit();
@@ -64,20 +67,17 @@ public class CannonBullet : OutOfScreenTeleporter, IAmmo
 
         graphics.SetPosition(movement.CurrentPos);
         lastPos = movement.CurrentPos;
-
-        base.Update(deltaTime);
     }
 
     public void PoolOnGet()
     {
         currentLifeTime = lifeTime;
-
-        graphics.SetActive(true);
+        graphics.SetActive(true); 
     }
 
     public void PoolOnRelease()
     {
-        SetUpdateActive(false);
+        SetUpdateActive?.Invoke(this, false);
         graphics.SetActive(false);
     }
 }
